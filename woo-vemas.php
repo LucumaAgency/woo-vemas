@@ -2,7 +2,7 @@
 /**
  * Plugin Name: VeMás Tienda (woo-vemas)
  * Description: Checkout de reportes digitales: sin dirección, con boleta o factura (DNI/CE o RUC + razón social), sin notas del pedido.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Lucuma Agency
  * Plugin URI: https://github.com/LucumaAgency/woo-vemas
  * Requires Plugins: woocommerce
@@ -45,6 +45,8 @@ add_filter( 'woocommerce_checkout_fields', function ( $f ) {
 	$f['billing']['billing_company']['class']    = [ 'form-row-wide', 'vemas-solo-factura' ];
 	if ( isset( $f['billing']['billing_country'] ) ) $f['billing']['billing_country']['priority'] = 80;
 	unset( $f['order']['order_comments'] );
+	// Woo ordena por prioridad antes de este filtro: reordenar aquí para que valga el orden de arriba
+	uasort( $f['billing'], function ( $x, $y ) { return ( $x['priority'] ?? 999 ) <=> ( $y['priority'] ?? 999 ); } );
 	return $f;
 }, 100 );
 
