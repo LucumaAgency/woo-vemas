@@ -2,7 +2,7 @@
 /**
  * Plugin Name: VeMás Tienda (woo-vemas)
  * Description: Checkout de reportes digitales: sin dirección, con boleta o factura (DNI/CE o RUC + razón social), sin notas del pedido.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Lucuma Agency
  * Plugin URI: https://github.com/LucumaAgency/woo-vemas
  * Requires Plugins: woocommerce
@@ -106,3 +106,21 @@ add_action( 'wp_footer', function () {
 	})();
 	</script>
 <?php } );
+
+/* 1.0.2 · Carga liviana: cada reporte tiene una sola portada, así que la galería de Woo (zoom, carrusel y visor) sobra.
+   Tampoco hay productos variables ni emojis. El carrito y el checkout usan shortcodes, así que Woo Blocks ya no carga. */
+add_action( 'after_setup_theme', function () {
+	remove_theme_support( 'wc-product-gallery-zoom' );
+	remove_theme_support( 'wc-product-gallery-lightbox' );
+	remove_theme_support( 'wc-product-gallery-slider' );
+}, 100 );
+add_action( 'wp_enqueue_scripts', function () {
+	foreach ( array( 'wc-zoom', 'zoom', 'wc-flexslider', 'flexslider', 'wc-photoswipe', 'photoswipe', 'wc-photoswipe-ui-default',
+		'photoswipe-ui-default', 'wc-add-to-cart-variation' ) as $h ) {
+		wp_dequeue_script( $h );
+	}
+	wp_dequeue_style( 'photoswipe' );
+	wp_dequeue_style( 'photoswipe-default-skin' );
+}, 100 );
+remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+remove_action( 'wp_print_styles', 'print_emoji_styles' );

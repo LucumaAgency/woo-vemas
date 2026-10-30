@@ -16,3 +16,4 @@ Metadatos del pedido: `_billing_comprobante` (boleta|factura), `_billing_documen
 ## Bitácora
 - 1.0.0 · 2026-10-30 · Primera versión.
 - 1.0.1 · 2026-10-30 · Orden de campos: nombre, apellidos, correo, celular, comprobante, documento, razón social, país.
+- 1.0.2 · 2026-10-30 · Carga liviana: sin galería de Woo (zoom, carrusel, visor), sin script de variaciones ni emojis en el front.
