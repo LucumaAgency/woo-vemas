@@ -124,3 +124,28 @@ add_action( 'wp_enqueue_scripts', function () {
 }, 100 );
 remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
 remove_action( 'wp_print_styles', 'print_emoji_styles' );
+
+/* 1.0.2 · Mi cuenta para reportes digitales: sin direcciones, menú con nombres claros y un resumen propio. */
+add_filter( 'woocommerce_account_menu_items', function ( $items ) {
+	unset( $items['edit-address'] );
+	$nombres = array(
+		'dashboard'       => 'Resumen',
+		'downloads'       => 'Mis reportes',
+		'orders'          => 'Mis pedidos',
+		'edit-account'    => 'Mis datos',
+		'customer-logout' => 'Cerrar sesión',
+	);
+	$out = array();
+	foreach ( array( 'dashboard', 'downloads', 'orders', 'edit-account', 'customer-logout' ) as $k ) {
+		if ( isset( $items[ $k ] ) ) $out[ $k ] = $nombres[ $k ];
+	}
+	return $out + $items;
+} );
+
+add_filter( 'wc_get_template', function ( $located, $template_name ) {
+	if ( 'myaccount/dashboard.php' === $template_name ) {
+		$propio = __DIR__ . '/templates/dashboard.php';
+		if ( file_exists( $propio ) ) return $propio;
+	}
+	return $located;
+}, 10, 2 );
