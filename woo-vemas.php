@@ -149,3 +149,9 @@ add_filter( 'wc_get_template', function ( $located, $template_name ) {
 	}
 	return $located;
 }, 10, 2 );
+
+/* 1.0.2 · En Mis reportes el botón dice "Descargar PDF" (el nombre del reporte ya está en la fila). */
+add_filter( 'woocommerce_customer_get_downloadable_products', function ( $downloads ) {
+	foreach ( $downloads as &$d ) $d['download_name'] = 'Descargar PDF';
+	return $downloads;
+} );
