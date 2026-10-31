@@ -2,7 +2,7 @@
 /**
  * Plugin Name: VeMás Tienda (woo-vemas)
  * Description: Checkout de reportes digitales: sin dirección, con boleta o factura (DNI/CE o RUC + razón social), sin notas del pedido.
- * Version: 1.0.2
+ * Version: 1.1.0
  * Author: Lucuma Agency
  * Plugin URI: https://github.com/LucumaAgency/woo-vemas
  * Requires Plugins: woocommerce
@@ -155,3 +155,6 @@ add_filter( 'woocommerce_customer_get_downloadable_products', function ( $downlo
 	foreach ( $downloads as &$d ) $d['download_name'] = 'Descargar PDF';
 	return $downloads;
 } );
+
+/* 1.1.0 · Migración de archivos desde ve-mas.com (TEMPORAL: quitar después del lanzamiento). */
+require_once __DIR__ . '/migracion.php';
