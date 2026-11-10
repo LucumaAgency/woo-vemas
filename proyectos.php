@@ -3,8 +3,9 @@
  * 1.4.0 · Proyectos consultados (casos de estudio de VeMás).
  *
  * - Tipo de contenido vm_proyecto + taxonomía vm_tipo (Residencial, Comercial, Usos mixtos, Horizontal, Industrial).
- * - URL como en la web anterior: /inmuebles/<tipo>/<slug>/ ; archivo /inmuebles/ y /inmuebles/<tipo>/.
- * - Si un caso cambió de tipo, /inmuebles/<tipo-viejo>/<slug>/ redirige 301 a la URL nueva.
+ * - URL /estudios-de-mercado/<tipo>/<slug>/ ; listado /estudios-de-mercado/ y /estudios-de-mercado/<tipo>/.
+ *   Las URLs /inmuebles/... (web anterior) redirigen 301 (1.5.0).
+ * - Si un caso cambió de tipo, la URL con el tipo viejo redirige 301 a la nueva.
  * - Campos (meta, editables por REST): vm_inmobiliaria, vm_distrito, vm_departamento, vm_tipo_proyecto, vm_anio,
  *   vm_estudio (tal como en la web anterior: "URBANO + BENCH + ESTRATEGIAS"), vm_enlace.
  * - Solo datos de la web anterior: sin módulos ni descripciones agregadas (1.4.2).
@@ -14,7 +15,8 @@ defined( 'ABSPATH' ) || exit;
 
 const VM_PT  = 'vm_proyecto';
 const VM_TAX = 'vm_tipo';
-const VM_RW  = '1.4.1'; // cambiar para volver a generar las reglas de URL
+const VM_RW  = '1.5.0';
+const VM_BASE = 'estudios-de-mercado'; // antes /inmuebles/ (web anterior): redirige 301 // cambiar para volver a generar las reglas de URL
 
 function vm_meta_keys() {
 	return array( 'vm_inmobiliaria', 'vm_distrito', 'vm_departamento', 'vm_tipo_proyecto', 'vm_anio', 'vm_estudio', 'vm_enlace' );
@@ -27,7 +29,7 @@ add_action( 'init', function () {
 		'hierarchical'      => true,
 		'show_in_rest'      => true,
 		'show_admin_column' => true,
-		'rewrite'           => array( 'slug' => 'inmuebles', 'with_front' => false ),
+		'rewrite'           => array( 'slug' => VM_BASE, 'with_front' => false ),
 	) );
 	register_post_type( VM_PT, array(
 		'labels'       => array( 'name' => 'Proyectos', 'singular_name' => 'Proyecto', 'add_new_item' => 'Añadir proyecto',
@@ -38,8 +40,8 @@ add_action( 'init', function () {
 		'menu_icon'    => 'dashicons-building',
 		'menu_position'=> 21,
 		'supports'     => array( 'title', 'thumbnail', 'excerpt', 'custom-fields', 'revisions' ),
-		'has_archive'  => 'inmuebles',
-		'rewrite'      => array( 'slug' => 'inmuebles/%' . VM_TAX . '%', 'with_front' => false ),
+		'has_archive'  => VM_BASE,
+		'rewrite'      => array( 'slug' => VM_BASE . '/%' . VM_TAX . '%', 'with_front' => false ),
 		'taxonomies'   => array( VM_TAX ),
 	) );
 	foreach ( vm_meta_keys() as $k ) {
@@ -69,6 +71,15 @@ add_filter( 'post_type_link', function ( $url, $post ) {
 	return str_replace( '%' . VM_TAX . '%', $t ? $t->slug : 'proyecto', $url );
 }, 10, 2 );
 
+// /inmuebles/... (web anterior y primera versión) → /estudios-de-mercado/... con 301.
+add_action( 'template_redirect', function () {
+	$path = trim( (string) wp_parse_url( $_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH ), '/' );
+	if ( 'inmuebles' === $path || 0 === strpos( $path, 'inmuebles/' ) ) {
+		wp_safe_redirect( home_url( '/' . VM_BASE . substr( $path, strlen( 'inmuebles' ) ) . '/' ), 301 );
+		exit;
+	}
+}, 1 );
+
 // URL vieja con otro tipo → 301 a la nueva (WordPress la resuelve igual, con o sin 404).
 add_action( 'template_redirect', function () {
 	if ( is_singular( VM_PT ) ) {
@@ -82,7 +93,7 @@ add_action( 'template_redirect', function () {
 	}
 	if ( ! is_404() ) return;
 	$path = trim( (string) wp_parse_url( $_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH ), '/' );
-	if ( ! preg_match( '#^inmuebles/[^/]+/([^/]+)$#', $path, $m ) ) return;
+	if ( ! preg_match( '#^' . VM_BASE . '/[^/]+/([^/]+)$#', $path, $m ) ) return;
 	$p = get_page_by_path( sanitize_title( $m[1] ), OBJECT, VM_PT );
 	if ( $p && 'publish' === $p->post_status ) {
 		wp_safe_redirect( get_permalink( $p ), 301 );
