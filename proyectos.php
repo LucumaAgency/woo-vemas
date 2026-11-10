@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 
 const VM_PT  = 'vm_proyecto';
 const VM_TAX = 'vm_tipo';
-const VM_RW  = '1.4.0'; // cambiar para volver a generar las reglas de URL
+const VM_RW  = '1.4.1'; // cambiar para volver a generar las reglas de URL
 
 function vm_meta_keys() {
 	return array( 'vm_inmobiliaria', 'vm_distrito', 'vm_departamento', 'vm_tipo_proyecto', 'vm_anio', 'vm_estudio', 'vm_enlace' );
@@ -70,8 +70,17 @@ add_filter( 'post_type_link', function ( $url, $post ) {
 	return str_replace( '%' . VM_TAX . '%', $t ? $t->slug : 'proyecto', $url );
 }, 10, 2 );
 
-// URL vieja con otro tipo → 301 a la nueva.
+// URL vieja con otro tipo → 301 a la nueva (WordPress la resuelve igual, con o sin 404).
 add_action( 'template_redirect', function () {
+	if ( is_singular( VM_PT ) ) {
+		$pedida = trim( (string) wp_parse_url( $_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH ), '/' );
+		$buena  = trim( (string) wp_parse_url( get_permalink( get_queried_object_id() ), PHP_URL_PATH ), '/' );
+		if ( $pedida && $buena && $pedida !== $buena && ! is_preview() ) {
+			wp_safe_redirect( get_permalink( get_queried_object_id() ), 301 );
+			exit;
+		}
+		return;
+	}
 	if ( ! is_404() ) return;
 	$path = trim( (string) wp_parse_url( $_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH ), '/' );
 	if ( ! preg_match( '#^inmuebles/[^/]+/([^/]+)$#', $path, $m ) ) return;
@@ -167,7 +176,7 @@ function vm_css_modulos() {
 .vm-comp p{grid-column:2;font-size:14.5px;color:#5F6766;line-height:1.5;margin:0}
 .vm-tipos{display:flex;gap:8px;flex-wrap:wrap}
 .vm-tipos a{font-family:Montserrat,sans-serif;font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid #E3E9E8;color:#191A1A;text-decoration:none;transition:.2s}
-.vm-tipos a:hover{border-color:#1C8E80;color:#1C8E80}.vm-tipos a.on{background:#1C8E80;border-color:#1C8E80;color:#fff}
+.vm-tipos a:hover{border-color:#1C8E80;color:#1C8E80}.vm-tipos a.on{background:#1C8E80;border-color:#1C8E80;color:#fff!important}
 @media(max-width:767px){.vm-mc{padding:22px 18px}.vm-strip span{width:38px;height:38px;font-size:12px}}
 </style>';
 }
