@@ -25,3 +25,4 @@ Metadatos del pedido: `_billing_comprobante` (boleta|factura), `_billing_documen
 - 1.3.2 · 2026-11-10 · Fuera migracion-pedidos.php: los 37 pedidos ya están importados (ids 384 a 420).
 - 1.4.0 · 2026-11-10 · proyectos.php: tipo de contenido Proyectos (vm_proyecto) + Tipos (vm_tipo) con URL /inmuebles/<tipo>/<slug>/ como la web anterior (301 si cambia el tipo), campos vm_*, shortcode [vemas_modulos parte="strip|cards"] y datos dinámicos {vm_*} para las plantillas de Bricks.
 - 1.4.1 · 2026-11-10 · Proyectos: URL vieja con otro tipo (ej. /inmuebles/comercial/flow/) redirige 301 aunque WordPress la resuelva; filtro de tipos con texto visible en el activo.
+- 1.4.2 · 2026-11-10 · Proyectos solo con datos de la web anterior: fuera el mapeo a módulos M1 a M5, sus descripciones y [vemas_modulos]; "Tipo de estudio" se muestra tal cual.
