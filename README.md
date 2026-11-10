@@ -18,3 +18,4 @@ Metadatos del pedido: `_billing_comprobante` (boleta|factura), `_billing_documen
 - 1.0.1 · 2026-10-30 · Orden de campos: nombre, apellidos, correo, celular, comprobante, documento, razón social, país.
 - 1.0.2 · 2026-10-30 · Carga liviana: sin galería de Woo (zoom, carrusel, visor), sin script de variaciones ni emojis en el front. Mi cuenta: sin direcciones, menú Resumen / Mis reportes / Mis pedidos / Mis datos, resumen propio (templates/dashboard.php).
 - 1.1.0 · 2026-10-30 · migracion.php TEMPORAL: rutas REST de administrador para comprobar archivos, proteger PDF y registrar imágenes copiadas de ve-mas.com. Quitar después del lanzamiento.
+- 1.1.1 · 2026-11-10 · Fuera migracion.php (rutas temporales vemas/v1): el sitio ya se lanzó en ve-mas.com.
