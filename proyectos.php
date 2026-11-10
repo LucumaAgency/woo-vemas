@@ -15,8 +15,8 @@ defined( 'ABSPATH' ) || exit;
 
 const VM_PT  = 'vm_proyecto';
 const VM_TAX = 'vm_tipo';
-const VM_RW  = '1.5.0';
-const VM_BASE = 'estudios-de-mercado'; // antes /inmuebles/ (web anterior): redirige 301 // cambiar para volver a generar las reglas de URL
+const VM_RW  = '1.5.0'; // cambiar para volver a generar las reglas de URL
+const VM_BASE = 'estudios-de-mercado'; // antes /inmuebles/ (web anterior): redirige 301
 
 function vm_meta_keys() {
 	return array( 'vm_inmobiliaria', 'vm_distrito', 'vm_departamento', 'vm_tipo_proyecto', 'vm_anio', 'vm_estudio', 'vm_enlace' );
