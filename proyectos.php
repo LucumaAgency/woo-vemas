@@ -130,8 +130,10 @@ function vm_componentes( $post = null ) {
 	$def  = vm_componentes_def();
 	$out  = array();
 	foreach ( preg_split( '/\s*\+\s*/', mb_strtoupper( trim( $raw ) ) ) as $k ) {
-		$k = str_replace( 'COYUNTURAL', 'COYUNTURA', trim( $k ) );
-		if ( '' === $k ) continue;
+		$k     = trim( $k );
+		$alias = array( 'COYUNTURAL' => 'COYUNTURA', 'POBLACIÓN' => 'POBLACIONAL', 'ESPACIO PÚBLICO' => 'ESPACIOS PÚBLICOS' );
+		$k     = $alias[ $k ] ?? $k;
+		if ( '' === trim( $k, '- ' ) ) continue;
 		$out[] = isset( $def[ $k ] ) ? array( 'key' => $k, 'm' => $def[ $k ][0], 't' => $def[ $k ][1], 'd' => $def[ $k ][2] )
 			: array( 'key' => $k, 'm' => '', 't' => mb_convert_case( mb_strtolower( $k ), MB_CASE_TITLE ), 'd' => '' );
 	}
@@ -217,6 +219,7 @@ function vm_tag_valor( $tag, $post ) {
 			return (string) count( vm_modulos_usados( $id ) );
 		case 'vm_estudio_resumen':
 			$c = vm_componentes( $id );
+			if ( ! $c ) return 'Estudio de mercado';
 			return 1 === count( $c ) ? 'Estudio de ' . mb_strtolower( $c[0]['t'] ) : count( $c ) . ' análisis cruzados';
 		case 'vm_archivo_titulo':
 			if ( is_tax( VM_TAX ) ) return 'Proyectos ' . vm_tipo_plural( get_queried_object() );
