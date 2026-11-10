@@ -23,3 +23,4 @@ Metadatos del pedido: `_billing_comprobante` (boleta|factura), `_billing_documen
 - 1.3.0 · 2026-11-10 · migracion-pedidos.php TEMPORAL: ruta POST vemas/v1/importar-pedido para pasar los 37 pedidos de la web anterior (respaldo del 2-nov) con fecha, estado y montos originales, sin correos. Quitar después de importar.
 - 1.3.1 · 2026-11-10 · Importación: la fecha de completado queda la original (antes salía la del día de importación); `corregir` rehace fechas de un pedido ya importado; GET vemas/v1/importados para verificar fechas y permisos de descarga.
 - 1.3.2 · 2026-11-10 · Fuera migracion-pedidos.php: los 37 pedidos ya están importados (ids 384 a 420).
+- 1.4.0 · 2026-11-10 · proyectos.php: tipo de contenido Proyectos (vm_proyecto) + Tipos (vm_tipo) con URL /inmuebles/<tipo>/<slug>/ como la web anterior (301 si cambia el tipo), campos vm_*, shortcode [vemas_modulos parte="strip|cards"] y datos dinámicos {vm_*} para las plantillas de Bricks.
