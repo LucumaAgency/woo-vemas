@@ -28,6 +28,43 @@ function vemas_fecha( $gmt ) {
 	return $gmt ? new WC_DateTime( $gmt, new DateTimeZone( 'UTC' ) ) : null;
 }
 
+function vemas_fechas_finales( $order, $p ) {
+	if ( ! empty( $p['pagado_gmt'] ) ) {
+		$order->set_date_paid( vemas_fecha( $p['pagado_gmt'] ) );
+	}
+	if ( ! empty( $p['completado_gmt'] ) ) {
+		$order->set_date_completed( vemas_fecha( $p['completado_gmt'] ) );
+	}
+	$order->set_date_modified( vemas_fecha( $p['modificado_gmt'] ?? $p['fecha_gmt'] ) );
+}
+
+/* GET vemas/v1/importados: pedidos importados con sus fechas y permisos de descarga (para verificar). */
+add_action( 'rest_api_init', function () {
+	register_rest_route( 'vemas/v1', '/importados', array(
+		'methods'             => 'GET',
+		'permission_callback' => function () { return current_user_can( 'manage_woocommerce' ); },
+		'callback'            => function () {
+			$ids   = wc_get_orders( array( 'limit' => -1, 'return' => 'ids', 'meta_query' => array( array( 'key' => '_vemas_pedido_original', 'compare' => 'EXISTS' ) ) ) );
+			$store = WC_Data_Store::load( 'customer-download' );
+			$out   = array();
+			foreach ( $ids as $id ) {
+				$o     = wc_get_order( $id );
+				$out[] = array(
+					'id'         => $id,
+					'origen'     => $o->get_meta( '_vemas_pedido_original' ),
+					'estado'     => $o->get_status(),
+					'creado'     => wc_rest_prepare_date_response( $o->get_date_created() ),
+					'pagado'     => wc_rest_prepare_date_response( $o->get_date_paid() ),
+					'completado' => wc_rest_prepare_date_response( $o->get_date_completed() ),
+					'email'      => $o->get_billing_email(),
+					'descargas'  => count( $store->get_downloads( array( 'order_id' => $id ) ) ),
+				);
+			}
+			return $out;
+		},
+	) );
+} );
+
 function vemas_importar_pedido( WP_REST_Request $req ) {
 	$p      = $req->get_json_params();
 	$origen = absint( $p['origen_id'] ?? 0 );
@@ -41,6 +78,12 @@ function vemas_importar_pedido( WP_REST_Request $req ) {
 		'meta_query' => array( array( 'key' => '_vemas_pedido_original', 'value' => (string) $origen ) ),
 	) );
 	if ( $ya ) {
+		if ( ! empty( $p['corregir'] ) ) { // 1.3.1: rehace fechas de pago, completado y modificación
+			$order = wc_get_order( $ya[0] );
+			vemas_fechas_finales( $order, $p );
+			$order->save();
+			return array( 'origen' => $origen, 'id' => $ya[0], 'creado' => false, 'corregido' => true );
+		}
 		return array( 'origen' => $origen, 'id' => $ya[0], 'creado' => false );
 	}
 
@@ -92,13 +135,7 @@ function vemas_importar_pedido( WP_REST_Request $req ) {
 	}
 	$order->save();
 
-	// 2) Estado final con sus fechas (da los permisos de descarga a los completados).
-	if ( ! empty( $p['pagado_gmt'] ) ) {
-		$order->set_date_paid( vemas_fecha( $p['pagado_gmt'] ) );
-	}
-	if ( ! empty( $p['completado_gmt'] ) ) {
-		$order->set_date_completed( vemas_fecha( $p['completado_gmt'] ) );
-	}
+	// 2) Estado final (da los permisos de descarga a los completados).
 	$order->set_status( $p['status'], '', false );
 	$order->save();
 
@@ -106,7 +143,7 @@ function vemas_importar_pedido( WP_REST_Request $req ) {
 	$order->set_payment_method( $p['metodo'] ?? '' );
 	$order->set_payment_method_title( $p['metodo_titulo'] ?? '' );
 	$order->set_transaction_id( $p['transaccion'] ?? '' );
-	$order->set_date_modified( vemas_fecha( $p['modificado_gmt'] ?? $p['fecha_gmt'] ) );
+	vemas_fechas_finales( $order, $p ); // después del cambio de estado, que pone la fecha de hoy
 	$order->save();
 
 	$order->add_order_note( $p['nota_privada'] ?? ( 'Pedido #' . $origen . ' importado de la web anterior.' ), 0, false );
