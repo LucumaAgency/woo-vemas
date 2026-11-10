@@ -22,3 +22,4 @@ Metadatos del pedido: `_billing_comprobante` (boleta|factura), `_billing_documen
 - 1.2.0 · 2026-11-10 · medicion.php: eventos GA4 por gtag (view_item, add_to_cart, begin_checkout, purchase una vez por pedido). Sin GTM: usa la etiqueta GT-5TQ464CS que está en Bricks.
 - 1.3.0 · 2026-11-10 · migracion-pedidos.php TEMPORAL: ruta POST vemas/v1/importar-pedido para pasar los 37 pedidos de la web anterior (respaldo del 2-nov) con fecha, estado y montos originales, sin correos. Quitar después de importar.
 - 1.3.1 · 2026-11-10 · Importación: la fecha de completado queda la original (antes salía la del día de importación); `corregir` rehace fechas de un pedido ya importado; GET vemas/v1/importados para verificar fechas y permisos de descarga.
+- 1.3.2 · 2026-11-10 · Fuera migracion-pedidos.php: los 37 pedidos ya están importados (ids 384 a 420).
